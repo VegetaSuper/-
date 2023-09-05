@@ -32,7 +32,7 @@ export class UserService {
     }
 
     async findList(param: RecordUserDto) {
-        const { page = 1, pageSize = 10, email = '', name = '' } = param;
+        const { page = 1, pageSize = 10, email, name } = param;
 
         const list = await prisma.user.findMany({
             skip: (page - 1) * pageSize,
@@ -48,6 +48,7 @@ export class UserService {
             select: userSelect,
             orderBy: { id: 'asc' }
         });
+
         const total = await prisma.user.count();
 
         return {

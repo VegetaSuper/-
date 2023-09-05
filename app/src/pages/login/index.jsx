@@ -9,27 +9,16 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 
-import { formDataToObject, lStorage, setToken } from '@/utils'
-import { login } from '@/apis/signup'
-import { useNavigate } from 'react-router-dom'
+import { formDataToObject } from '@/utils'
+import { useUserStore } from '@/store'
 
 export default function SignIn () {
-    const navigate = useNavigate()
-
+    const { userlogin } = useUserStore()
     function handleSubmit (event) {
         event.preventDefault()
         const loginForm = formDataToObject(event.currentTarget)
-        login(loginForm).then(res => {
-            const { message, data } = res
-            setToken(data.accessToken)
-            lStorage.set('refresh_token', data.refreshToken)
+        userlogin(loginForm)
 
-            window.$message.success(message, {
-                onClose: () => {
-                    navigate('/app')
-                }
-            })
-        })
     }
 
     return (

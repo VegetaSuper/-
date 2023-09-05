@@ -14,7 +14,7 @@ async function bootstrap() {
             prefix: '/static/'
         });
         // 设置统一接口前缀
-        // app.setGlobalPrefix('/api');
+        app.setGlobalPrefix('/api');
         // 生成文档
         generateDocument(app);
         // response header 安全帽

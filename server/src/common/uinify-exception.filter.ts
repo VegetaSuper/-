@@ -17,12 +17,13 @@ export default class UnifyExceptionFilter implements ExceptionFilter {
         const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
         let message: any = exception.message;
-        if (exception.getResponse) {
+        if (exception instanceof HttpException) {
             const response = exception.getResponse();
+
             if (typeof response === 'string') {
                 message = response;
             } else if (typeof response === 'object' && response && 'message' in response) {
-                message = response.message[0];
+                message = response.message;
             } else {
                 message = 'Internal Server Error';
             }

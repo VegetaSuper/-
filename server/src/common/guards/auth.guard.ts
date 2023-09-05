@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 
@@ -14,15 +14,16 @@ export class JwtAuthGuard implements CanActivate {
         const token = request.headers.authorization;
 
         if (!token) {
-            throw new Error('请登录后再进行操作');
+            throw new UnauthorizedException('请登录后再进行操作');
         }
         try {
             const payload = await this.jwtService.verifyAsync(token, {
                 secret: process.env.JWT_SECRET
             });
+
             request['user'] = payload;
         } catch {
-            throw new Error('令牌失效');
+            throw new UnauthorizedException('令牌已过期，请重新登录');
         }
         return true;
     }
