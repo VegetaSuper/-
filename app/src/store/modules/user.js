@@ -12,7 +12,7 @@ export const useUserStore = create((set) => ({
         window.$message.success(message)
 
         const user = await getProfile()
-        location.href = '/app'
+        location.href = '/app/all'
         return ({ userInfo: user.data })
     })
 }))

@@ -7,6 +7,7 @@ import { RegisterDto } from './app.dto';
 export class AppService {
     constructor(private readonly jwtService: JwtService) {}
 
+    // 注册
     async register(data: RegisterDto) {
         const existingUser = await prisma.user.findUnique({
             where: { email: data.email }
@@ -31,6 +32,7 @@ export class AppService {
         };
     }
 
+    // 登录
     async login(data: RegisterDto) {
         // 验证用户凭据（用户名、密码等）
         const user = await prisma.user.findUnique({
@@ -41,8 +43,14 @@ export class AppService {
         if (password != data.password) throw new Error('用户密码错误');
 
         // 生成令牌和刷新令牌
-        const accessToken = await this.jwtService.signAsync({ email: user.email, id: user.id }, { expiresIn: '0.5h' });
-        const refreshToken = await this.jwtService.signAsync({ email: user.email, id: user.id }, { expiresIn: '7d' });
+        const accessToken = await this.jwtService.signAsync(
+            { email: user.email, id: user.id },
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRES }
+        );
+        const refreshToken = await this.jwtService.signAsync(
+            { email: user.email, id: user.id },
+            { expiresIn: process.env.REFRESH_TOKEN_EXPIRES }
+        );
 
         return {
             data: {
@@ -53,6 +61,7 @@ export class AppService {
         };
     }
 
+    // 刷新token
     async refresh(token: string) {
         try {
             const data = this.jwtService.verify(token);
@@ -64,9 +73,12 @@ export class AppService {
             // 生成令牌和刷新令牌
             const accessToken = await this.jwtService.signAsync(
                 { email: user.email, id: user.id },
-                { expiresIn: '12h' }
+                { expiresIn: process.env.ACCESS_TOKEN_EXPIRES }
             );
-            const refreshToken = await this.jwtService.signAsync({ email: user.email }, { expiresIn: '7d' });
+            const refreshToken = await this.jwtService.signAsync(
+                { email: user.email, id: user.id },
+                { expiresIn: process.env.REFRESH_TOKEN_EXPIRES }
+            );
 
             return {
                 data: {
@@ -78,19 +90,5 @@ export class AppService {
         } catch (error) {
             throw new NotFoundException('令牌已过期，请重新登录');
         }
-    }
-
-    async getProfile(token: string) {
-        const data = this.jwtService.verify(token);
-        const user = await prisma.user.findUnique({
-            where: { id: data.id }
-        });
-        delete user.password;
-        delete user.createdAt;
-        delete user.updatedAt;
-
-        return {
-            data: user
-        };
     }
 }

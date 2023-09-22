@@ -1,15 +1,13 @@
 import { useEffect } from 'react'
 
-function ErrorPage () {
-
+function TaskPage () {
     useEffect(() => {
-
 
     }, [])
 
     return (
-        <h1>需要权限</h1>
+        <h1>任务</h1>
     )
 }
 
-export default ErrorPage
+export default TaskPage

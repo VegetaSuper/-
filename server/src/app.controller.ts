@@ -1,10 +1,9 @@
-import { Controller, Post, Body, Get, Query, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { AppService } from './app.service';
 import { RegisterDto } from './app.dto';
 import { Public } from 'src/common/decorator/public.decorator';
-import { Request } from 'express';
 
 @ApiTags('其它')
 @Controller('')
@@ -37,14 +36,4 @@ export class AppController {
     async refresh(@Query('token') token: string) {
         return this.appService.refresh(token);
     }
-
-    @ApiOperation({
-        summary: '根据token获取用户信息'
-    })
-    @Public()
-    @Get('/getProfile')
-    async getProfile(@Req() request: Request) {
-        return this.appService.getProfile(request.headers.authorization);
-    }
-    // getProfile
 }

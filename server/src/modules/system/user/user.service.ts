@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import prisma from 'src/common/prisma';
+import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto, UpdateUserDto, RecordUserDto } from './user.dto';
 const userSelect = {
     id: true,
@@ -9,6 +10,8 @@ const userSelect = {
 };
 @Injectable()
 export class UserService {
+    constructor(private readonly jwtService: JwtService) {}
+
     async create(data: CreateUserDto) {
         const existingUser = await prisma.user.findUnique({
             where: { email: data.email }
@@ -111,5 +114,19 @@ export class UserService {
                 error
             };
         }
+    }
+
+    async getProfile(token: string) {
+        const data = this.jwtService.verify(token);
+        const user = await prisma.user.findUnique({
+            where: { id: data.id }
+        });
+        delete user.password;
+        delete user.createdAt;
+        delete user.updatedAt;
+
+        return {
+            data: user
+        };
     }
 }

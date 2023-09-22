@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Param, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, ParseIntPipe, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
 import { CreateUserDto, RecordUserDto, UpdateUserDto, DeleteUserDto } from './user.dto';
+import { Request } from 'express';
+
 @ApiTags('用户')
 @Controller('system/user')
 export class UserController {
@@ -47,5 +49,13 @@ export class UserController {
     async remove(@Body() data: DeleteUserDto) {
         const userIds = data.ids.split(',').map((item) => Number(item));
         return this.userService.remove(userIds);
+    }
+
+    @ApiOperation({
+        summary: '根据token获取用户信息'
+    })
+    @Get('/getProfile')
+    async getProfile(@Req() request: Request) {
+        return this.userService.getProfile(request.headers.authorization);
     }
 }
